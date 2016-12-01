@@ -1,0 +1,59 @@
+version: "2"
+services:
+
+  rails_mysql:
+    container_name: rails_mysql
+    image: mysql
+    env_file:
+      - ./env/mysql.env
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    volumes:
+      - "./mysql:/var/lib/mysql"
+
+  rails_redis:
+    container_name: rails_redis
+    image: redis:alpine
+    env_file:
+      - ./env/redis.env
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  rails_memcached:
+    container_name: rails_memcached
+    image: memcached:alpine
+    env_file:
+      - ./env/memcached.env
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  rails:
+    container_name: rails
+    image: rails
+    env_file:
+      - ./env/rails.env
+    # links:
+      # - rails_mysql:mysql
+      # - rails_redis:redis
+      # - rails_memcached:memcached
+    depends_on:
+      - rails_mysql
+      - rails_redis
+      - rails_memcached
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    volumes:
+      - ./app:/app
+    tty: true
